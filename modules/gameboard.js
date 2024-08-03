@@ -4,12 +4,41 @@ export class Gameboard {
         this.missedShots = [];
     }
 
-    placeShip(ship, x, y) {
-        // Simple placement logic: place ship at (x, y)
-        // Assuming vertical placement for simplicity
+    // Check if a position is within bounds and does not overlap with existing ships
+    isValidPlacement(ship, x, y, orientation) {
+        if (orientation === 'horizontal') {
+            if (x + ship.length > 10) return false;
+            for (let i = 0; i < ship.length; i++) {
+                if (this.ships.some(shipObj =>
+                    shipObj.coordinates.some(coord => coord.x === x + i && coord.y === y)
+                )) {
+                    return false;
+                }
+            }
+        } else {
+            if (y + ship.length > 10) return false;
+            for (let i = 0; i < ship.length; i++) {
+                if (this.ships.some(shipObj =>
+                    shipObj.coordinates.some(coord => coord.x === x && coord.y === y + i)
+                )) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    placeShip(ship, x, y, orientation) {
+        if (!this.isValidPlacement(ship, x, y, orientation)) {
+            throw new Error('Invalid placement');
+        }
         const coordinates = [];
         for (let i = 0; i < ship.length; i++) {
-            coordinates.push({ x, y: y + i });
+            if (orientation === 'horizontal') {
+                coordinates.push({ x: x + i, y });
+            } else {
+                coordinates.push({ x, y: y + i });
+            }
         }
         this.ships.push({ ship, coordinates });
     }

@@ -4,23 +4,14 @@ import { ComputerPlayer } from './computerPlayer.js';
 import { Ship } from './ship.js';
 
 export function setupUI() {
-    console.log("setup ui is called")
     const player1 = new Player('Player 1');
     const player2 = new ComputerPlayer('Computer');
 
-    // Example ship placements for player1
-    placeShips(player1.gameboard, [
-        new Ship(3),
-        new Ship(2),
-        new Ship(1)
-    ]);
+    // Randomly place ships for player1
+    placeShipsRandomly(player1.gameboard);
 
-    // Example ship placements for player2
-    placeShips(player2.gameboard, [
-        new Ship(3),
-        new Ship(2),
-        new Ship(1)
-    ]);
+    // Randomly place ships for player2
+    placeShipsRandomly(player2.gameboard);
 
     const gameController = new GameController(player1, player2);
 
@@ -55,16 +46,25 @@ function createBoard(boardId) {
     }
 }
 
-function placeShips(gameboard, ships) {
-    // Example placement logic
-    let startX = 0;
-    let startY = 0;
+function placeShipsRandomly(gameboard) {
+    const ships = [
+        new Ship(3),
+        new Ship(2),
+        new Ship(1)
+    ];
+
     ships.forEach(ship => {
-        gameboard.placeShip(ship, startX, startY);
-        startX += ship.length + 1; // Move start position for next ship (for simplicity)
-        if (startX >= 10) {
-            startX = 0;
-            startY += 1;
+        let placed = false;
+        while (!placed) {
+            const orientation = Math.random() > 0.5 ? 'horizontal' : 'vertical';
+            const x = Math.floor(Math.random() * 10);
+            const y = Math.floor(Math.random() * 10);
+            try {
+                gameboard.placeShip(ship, x, y, orientation);
+                placed = true;
+            } catch (error) {
+                // Ship placement failed, try a different location
+            }
         }
     });
 }
